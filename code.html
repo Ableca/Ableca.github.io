@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>¡Feliz Cumpleaños, Amor!</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #ffdde1, #f5a6e6 80%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe Script', cursive, sans-serif;
+      margin: 0;
+      overflow: hidden;
+    }
+    .card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      text-align: center;
+      max-width: 400px;
+      z-index: 2;
+      position: relative;
+    }
+    h1 {
+      color: #e75480;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.2em;
+      color: #a64ca6;
+      margin-bottom: 20px;
+    }
+    .love {
+      font-size: 2em;
+      color: #f44369;
+      animation: heartbeat 1s infinite;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1);}
+      25% { transform: scale(1.1);}
+      50% { transform: scale(1.2);}
+      75% { transform: scale(1.1);}
+    }
+    button {
+      background: #e75480;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 32px;
+      font-size: 1.2em;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(231,84,128,0.2);
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #b8325e;
+    }
+    #confetti-canvas {
+      position: fixed;
+      pointer-events: none;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      z-index: 10;
+    }
+
+    /* Carta emergente */
+    .popup-letter-bg {
+      display: none;
+      position: fixed;
+      z-index: 20;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4);
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-letter-bg.active {
+      display: flex;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .popup-letter {
+      background: #fff0fa;
+      border-radius: 16px;
+      max-width: 350px;
+      padding: 36px 30px 28px 30px;
+      box-shadow: 0 8px 40px rgba(231,84,128,0.25);
+      text-align: center;
+      position: relative;
+      animation: popUp 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    @keyframes popUp {
+      0% { transform: scale(0.4);}
+      60% { transform: scale(1.1);}
+      100% { transform: scale(1);}
+    }
+    .popup-letter h2 {
+      color: #e75480;
+      margin-bottom: 12px;
+    }
+    .popup-letter p {
+      color: #a64ca6;
+      font-size: 1.15em;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      background: none;
+      border: none;
+      color: #e75480;
+      font-size: 1.6em;
+      cursor: pointer;
+    }
+    .popup-letter .heart {
+      font-size: 2em;
+      color: #f44369;
+      animation: heartbeat 1s infinite;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .card, .popup-letter { max-width: 90vw; padding: 18px 6vw; }
+      .popup-letter { font-size: 0.98em;}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+  <div class="card">
+    <h1>¡Feliz Cumpleaños, Mi Amor! 🎂</h1>
+    <p>Hoy celebro tu vida y lo afortunado que soy de tenerte.<br>
+    Que todos tus sueños se hagan realidad y quiero compartir cada
+    uno de ellos a tulado.<br>
+    <span class="love">❤️ Te amo muchísimo mi corazon ❤️</span></p>
+    <button onclick="showSurprise()">¡Haz clic para tu sorpresa!</button>
+  </div>
+
+  <!-- Carta emergente -->
+  <div class="popup-letter-bg" id="popupLetterBg">
+    <div class="popup-letter">
+      <button class="close-btn" onclick="closeLetter()">&times;</button>
+      <div class="heart">💖</div>
+      <h2>Mi vida hermosa,</h2>
+      <p>
+        Hoy es tu día especial y quiero recordarte lo importante que eres para mí.<br>
+        Gracias por tu amor, por tu sonrisa y por hacer cada día mejor.<br>
+        Te deseo un año lleno de alegría, sueños cumplidos y mucho amor.<br>
+        <b>¡Feliz cumpleaños, mi reina! Te amo con todo mi corazón.</b>
+        <b>Eres lo mejor que ma ah podido pasar en la vida gracias por estar
+            conmigo se lo dificil que es estarlo pero quiero recordarte 
+            que te amo como no tienes una idea espero y te guste esta serpresa
+            se que no es mucho pero la hize con todo mi corazon para ti ❣
+        </b>
+      </p>
+      <div class="heart">💖</div>
+    </div>
+    <!-- Música MP3 oculta -->
+    <audio id="irisMusic" src="iris.mp3"></audio>
+  </div>
+
+  <script>
+    // Confetti animation
+    function throwConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let pieces = [];
+      for (let i = 0; i < 150; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height,
+          size: 6 + Math.random() * 8,
+          color: `hsl(${Math.random()*360},80%,60%)`,
+          speed: 2 + Math.random() * 3,
+          rotation: Math.random() * 2 * Math.PI
+        });
+      }
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let p of pieces) {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation + frame/20);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+          ctx.restore();
+          p.y += p.speed;
+          if (p.y > canvas.height) p.y = Math.random() * -50;
+        }
+        frame++;
+        if (frame < 250) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      draw();
+    }
+
+    // Mostrar la carta, lanzar el confeti y reproducir música
+    function showSurprise() {
+      throwConfetti();
+      document.getElementById('popupLetterBg').classList.add('active');
+      // Reproducir Iris MP3
+      var iris = document.getElementById('irisMusic');
+      iris.currentTime = 0;
+      iris.play();
+    }
+    function closeLetter() {
+      document.getElementById('popupLetterBg').classList.remove('active');
+      // Detener la música
+      var iris = document.getElementById('irisMusic');
+      iris.pause();
+      iris.currentTime = 0;
+    }
+
+    window.addEventListener('resize', () => {
+      const canvas = document.getElementById('confetti-canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
